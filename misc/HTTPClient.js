@@ -5,17 +5,15 @@ class HTTPClient {
         this.config = new Configuration()
     }
 
-    getProviders = async ({ name = '', only = '', reputation = '' }) => {
+    getProviders = async ({ name = '', only = '', reputation = '' , page = 1}) => {
 
         var config = {
             method: 'GET',
         }
 
-        const urlParams = getQueryString({ name, only, reputation })
+        const urlParams = getQueryString({ name, only, reputation, page})
         const endpointProviders = '/providers?'
         const url = this.config.API_URL + endpointProviders + urlParams
-
-        console.log(url)
         var response = await fetch(url, config)
 
         if (response.ok) {
@@ -24,9 +22,9 @@ class HTTPClient {
 
             const institutionsData = data.filter( (d) => d.user == null)
             const specialistsData = data.filter( (d) => d.institution == null)
-            const results = {institutions: institutionsData , specialists: specialistsData}
-            console.log(results)
-            console.log(res.result.providers.total)
+            const lastPage = res.result.providers.last_page
+
+            const results = {institutions: institutionsData , specialists: specialistsData, last_page: lastPage}
             return (results)
         }
         else {

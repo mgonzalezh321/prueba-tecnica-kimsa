@@ -23,22 +23,34 @@ export default class Searcher extends React.Component {
       all: true,
       institutions: false,
       specialists: false,
-      text: ''
+      text: '',
+      page: 1
     },
-    data: {institutions: [], specialists: []}
+    data: { institutions: [], specialists: [], last_page: 1 },
+    loading: false
   }
 
   onValueChangeMin = (value) => {
-    this.setState({ filters: { ...this.state.filters, selectedMin: value } }, () => this.getProvidersData());
+    this.setState({
+      filters: { ...this.state.filters, selectedMin: value, page: 1 },
+      data: { institutions: [], specialists: [], last_page: 1 },
+    }, () => this.getProvidersData());
   }
 
   onValueChangeMax = (value) => {
-    this.setState({ filters: { ...this.state.filters, selectedMax: value } }, () => this.getProvidersData());
+    this.setState({
+      filters: { ...this.state.filters, selectedMax: value, page: 1 },
+      data: { institutions: [], specialists: [], last_page: 1 },
+    }, () => this.getProvidersData());
   }
 
 
-  _onChangeSearchText = (text) => {
-    this.setState({ filters: { ...this.state.filters, text } }, () => this.getProvidersData() )
+  _onChangeSearchText = (_text) => {
+    this.setState({
+      filters:
+        { ...this.state.filters, text: _text, page: 1 },
+      data: { institutions: [], specialists: [], last_page: 1 },
+    }, () => this.getProvidersData())
   }
 
   handleAllType = () => {
@@ -48,7 +60,9 @@ export default class Searcher extends React.Component {
         all: true,
         institutions: false,
         specialists: false,
-      }
+        page: 1
+      },
+      data: { institutions: [], specialists: [], last_page: 1 },
     }, () => this.getProvidersData())
   }
 
@@ -59,7 +73,9 @@ export default class Searcher extends React.Component {
         all: false,
         institutions: true,
         specialists: false,
-      }
+        page: 1
+      },
+      data: { institutions: [], specialists: [], last_page: 1 },
     }, () => this.getProvidersData())
   }
 
@@ -70,23 +86,73 @@ export default class Searcher extends React.Component {
         all: false,
         institutions: false,
         specialists: true,
-      }
+        page: 1
+      },
+      data: { institutions: [], specialists: [], last_page: 1 },
     }, () => this.getProvidersData())
   }
 
 
-  getProvidersData = async () => {
+  getProvidersData = () => {
+    //this.scrollView.scrollToEnd({ animated: true })
+    this.activateLoading();
+
     const query = this.query.createQuery(this.state.filters)
-    var res = await this.client.getProviders(query)
-    this.setState({
-      data: res
+
+    this.client.getProviders(query).then((res) => {
+      if (this.state.filters.page > 1) {
+        this.setState({
+          data: {
+            institutions: this.state.data.institutions.slice().concat(res.institutions),
+            specialists: this.state.data.specialists.slice().concat(res.specialists),
+            last_page: res.last_page
+          }
+        })
+      }
+      else {
+        this.setState({
+          data: res
+        })
+      }
+      this.deactivateLoading();
     })
   }
 
-  render() {
-    const {all, institutions, specialists, selectedMin, selectedMax} = this.state.filters
-    const { data } = this.state
 
+  isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
+    return layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
+  }
+
+
+
+  isCloseToTop = ({ layoutMeasurement, contentOffset, contentSize }) => {
+    return contentOffset.y == 0;
+  }
+
+  activateLoading = () => {
+    this.setState({ loading: true })
+  }
+
+  deactivateLoading = () => {
+    this.setState({ loading: false })
+  }
+
+  handleEndScreen = () => {
+    this.setState({ filters: { ...this.state.filters, page: this.state.filters.page + 1 } }, () => {
+      this.getProvidersData()
+    })
+  }
+
+  handleLimitScrolling = ({ nativeEvent }) => {
+    if (this.isCloseToBottom(nativeEvent) && this.state.data.last_page > 1) {
+      this.handleEndScreen()
+    }
+  }
+
+
+  render() {
+    const { all, institutions, specialists, selectedMin, selectedMax } = this.state.filters
+    const { data } = this.state
     return (
       <Container>
         <Header searchBar rounded autoCorrect={false} hasSegment>
@@ -94,9 +160,8 @@ export default class Searcher extends React.Component {
             <Icon name="ios-search" />
             <Input
               onChangeText={this._onChangeSearchText} // <-- Here
-              placeholder="Escribe aquí para buscar"
+              placeholder={"Escribe aquí para buscar"}
             />
-            <Icon name="ios-people" />
           </Item>
         </Header>
         <Segment>
@@ -148,29 +213,24 @@ export default class Searcher extends React.Component {
         {/*
         <Spinner color='blue' />
         */}
-        <ListSearch data={data} />
+        <ScrollView
+          ref={ref => this.scrollView = ref}
+          onScroll={this.handleLimitScrolling}>
+          <ListSearch data={data} loading={this.state.loading} />
+        </ScrollView>
       </Container>
     );
   }
 }
 
 const compare = (obj1, obj2) => {
-  //check for obj2 overlapping props
   if (!Object.keys(obj2).every(key => obj1.hasOwnProperty(key))) {
     return false;
   }
-
-  //check every key for being same
   return Object.keys(obj1).every(function (key) {
-
-    //if object
     if ((typeof obj1[key] == "object") && (typeof obj2[key] == "object")) {
-
-      //recursively check
       return compare(obj1[key], obj2[key]);
     } else {
-
-      //do the normal compare
       return obj1[key] === obj2[key];
     }
   });

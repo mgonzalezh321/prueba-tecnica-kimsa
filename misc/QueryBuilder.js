@@ -2,11 +2,12 @@ class QueryBuilder{
 
     query = {}
 
-    createQuery = ({text, selectedMin, selectedMax, all, institutions, specialists}) => {
+    createQuery = ({text, selectedMin, selectedMax, all, institutions, specialists, page}) => {
         return({
             name: text, 
             reputation: this.formatRange(selectedMin, selectedMax),
-            only: this.formatType({all, institutions, specialists})
+            only: this.formatType({all, institutions, specialists}),
+            page
         })
     }
 

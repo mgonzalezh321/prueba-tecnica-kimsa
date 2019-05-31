@@ -41,5 +41,5 @@ SearchStack.navigationOptions = {
 
 export default createBottomTabNavigator({
   HomeStack,
-  LinksStack: SearchStack,
+  SearchStack,
 });
