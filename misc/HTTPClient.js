@@ -33,12 +33,14 @@ class HTTPClient {
             return (results)
         }
         else {
-            return (
-                {
-                    ok: false,
-                    message: 'error'
-                }
-            )
+            const error = {
+                ok: false,
+                message: error,
+                institutions: [],
+                specialists: [],
+                last_page: 1
+            }
+            return (error)
         }
 
 
