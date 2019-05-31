@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import { Content, List, ListItem, Thumbnail, Text, Left, Body, Right, Button, Spinner } from 'native-base';
 import Star from 'react-native-star-view';
 
+/* 
+ListSearch: Componente que se encarga de enlistar los resultados obtenidos por los filtros.
+*/
+
 export default class ListSearch extends Component {
   render() {
     const { institutions, specialists } = this.props.data
@@ -48,6 +52,10 @@ const urlTest = 'https://upload.wikimedia.org/wikipedia/commons/7/72/Default-wel
 
 // NOTA: Las estrellas que se refieren al ranking están solo de forma visual ya que el endpoint no entregaba el ranking promedio.
 
+/* 
+SpecialistItem: Funcion que entrega la estructura visual del resultado de un especialista y sus atributos.
+*/
+
 const SpecialistItem = ({ firstName, lastNames, phone1, description, email }) => {
   return (
     <ListItem thumbnail style={{ height: 'auto' }}>
@@ -72,6 +80,10 @@ const SpecialistItem = ({ firstName, lastNames, phone1, description, email }) =>
       </Right>
     </ListItem>)
 }
+
+/* 
+SpecialistItem: Funcion que entrega la estructura visual del resultado de una institucion y sus atributos.
+*/
 
 const InstitutionItem = ({ name, description }) => {
   return (

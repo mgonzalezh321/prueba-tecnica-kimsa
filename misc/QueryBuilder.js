@@ -1,3 +1,8 @@
+
+/*
+    QueryBuilder: clase que se encarga de pre-procesar los filtros para que HTTPClient los ocupe en la consulta
+*/
+
 class QueryBuilder{
 
     query = {}

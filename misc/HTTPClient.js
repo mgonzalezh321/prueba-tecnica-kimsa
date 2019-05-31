@@ -1,5 +1,10 @@
 import Configuration from '../config/config'
 
+
+/*
+    HTTPClient: clase que se encarga de hacer las query a uno o varios endpoint de la API.
+*/
+
 class HTTPClient {
     constructor() {
         this.config = new Configuration()
@@ -39,6 +44,8 @@ class HTTPClient {
 
     }
 }
+
+//Parseador de parámetros para ingresarlos por URL
 
 const getQueryString = (params) => {
     return Object

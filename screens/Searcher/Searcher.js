@@ -5,6 +5,10 @@ import ListSearch from './ListSearch'
 import QueryBuilder from '../../misc/QueryBuilder'
 import HTTPClient from '../../misc/HTTPClient'
 
+/*
+  Searcher: Componente que se encarga de hacer los filtros de búsqueda y hacer las consultas al endpoint bajo éstos.
+*/
+
 export default class Searcher extends React.Component {
   static navigationOptions = {
     title: 'Buscar',
@@ -123,8 +127,6 @@ export default class Searcher extends React.Component {
     return layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
   }
 
-
-
   isCloseToTop = ({ layoutMeasurement, contentOffset, contentSize }) => {
     return contentOffset.y == 0;
   }
@@ -210,9 +212,6 @@ export default class Searcher extends React.Component {
         <ListItem itemHeader first style={{ paddingBottom: -20 }}>
           <Text>Resultados</Text>
         </ListItem>
-        {/*
-        <Spinner color='blue' />
-        */}
         <ScrollView
           ref={ref => this.scrollView = ref}
           onScroll={this.handleLimitScrolling}>
@@ -221,19 +220,6 @@ export default class Searcher extends React.Component {
       </Container>
     );
   }
-}
-
-const compare = (obj1, obj2) => {
-  if (!Object.keys(obj2).every(key => obj1.hasOwnProperty(key))) {
-    return false;
-  }
-  return Object.keys(obj1).every(function (key) {
-    if ((typeof obj1[key] == "object") && (typeof obj2[key] == "object")) {
-      return compare(obj1[key], obj2[key]);
-    } else {
-      return obj1[key] === obj2[key];
-    }
-  });
 }
 
 const styles = StyleSheet.create({
